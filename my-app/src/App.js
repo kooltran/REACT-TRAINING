@@ -20,7 +20,7 @@ class CardItem extends Component {
         <h3>{this.props.name}</h3>
         <img src={this.props.url} alt=''/>
         <p>{this.props.email}</p>
-        <button onClick={this.props.toggleLike}>{this.props.liked ? 'dislike': 'like'}</button>
+        <button onClick={() => this.props.toggleLike(this.props.email)}>{this.props.liked ? 'dislike': 'like'}</button>
       </div>
     )
   }
@@ -32,7 +32,7 @@ class CardList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLiked: false,
+      listLiked: [],
       users: [],
     }
     this.getUsers = this.getUsers.bind(this);
@@ -43,10 +43,18 @@ class CardList extends Component {
     this.getUsers();
   }
 
-  toggleLike() {
-    this.setState({
-      isLiked: !this.state.isLiked,
-    })
+  toggleLike(userEmail) {
+    const { listLiked } = this.state;
+    const isLiked = listLiked.find((email) => email === userEmail);
+    if (isLiked) {
+      this.setState({
+        listLiked: listLiked.filter(email => email !== userEmail),
+      })
+    } else {
+      this.setState({
+        listLiked: listLiked.concat(userEmail),
+      })
+    }
   }
 
   getUsers() {
@@ -70,7 +78,8 @@ class CardList extends Component {
               key={index}
               name={item.name.first}
               toggleLike={this.toggleLike}
-              liked={this.state.isLiked} url={item.picture.large}
+              liked={this.state.listLiked.find(email => email === item.email)}
+              url={item.picture.large}
               email={item.email}
           />
         )}
