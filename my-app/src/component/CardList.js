@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import CardItem from './CardItem';
 import AddUser from './AddUser';
-import SearchUser from './SearchUser';
 
 class CardList extends Component {
   constructor(props) {
@@ -10,13 +9,13 @@ class CardList extends Component {
       listLiked: [],
       users: [],
       listRemoved: [],
-      searchList: [],
+      searchString: '',
     }
     this.getUsers = this.getUsers.bind(this);
     this.toggleLike = this.toggleLike.bind(this);
     this.removeUsers = this.removeUsers.bind(this);
     this.getInfoItem = this.getInfoItem.bind(this);
-    this.searchHandleList = this.searchHandleList.bind(this);
+    this.renderList = this.renderList.bind(this);
   }
 
   componentWillMount() {
@@ -71,30 +70,38 @@ class CardList extends Component {
     })
   }
 
-  searchHandleList(searchString) {
-    this.setState({
-      searchList: this.state.users.filter(users => users.name.first.indexOf(searchString) !== -1)
+  renderList() {
+    const searchString = this.state.searchString;
+    const searchByName = (user) => {
+        return searchString.length === 0 || (user.name.first).indexOf(searchString) !== -1
+    }
+    const searchedList = this.state.users.filter(searchByName);
+    return searchedList.map((item, index) => {
+      return (
+        <CardItem
+            key={index}
+            name={item.name.first}
+            toggleLike={this.toggleLike}
+            removeUsers={this.removeUsers}
+            liked={this.state.listLiked.find(email => email === item.email)}
+            url={item.picture.large}
+            email={item.email}
+        />
+      )
     })
   }
 
   render() {
-    // const user = this.state.users;
-    const searchList = this.state.searchList;
+    const users = this.state.users;
     return (
       <div className="container">
         <AddUser getInfo={this.getInfoItem} />
-        <SearchUser searchHandle={this.searchHandleList}/>
-        {searchList.map((item, index) =>
-          <CardItem
-              key={index}
-              name={item.name.first}
-              toggleLike={this.toggleLike}
-              removeUsers={this.removeUsers}
-              liked={this.state.listLiked.find(email => email === item.email)}
-              url={item.picture.large}
-              email={item.email}
-          />
-        )}
+        <input type="text" onChange={(e) => this.setState({searchString: e.target.value})}  placeholder="Type to search..." />
+        {
+          users.length > 0
+          ? this.renderList()
+          : <p>Loading...</p>
+        }
         <a className="text-center" href="#" onClick={this.getUsers}>load more...</a>
       </div>
     )
