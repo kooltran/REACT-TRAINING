@@ -1,17 +1,30 @@
 import React, { Component } from 'react';
-import FormErrors from './FormErrors';
+import ErrorMessage from './ErrorMessage';
 
+// stateless component
+const Input = (props) => {
+  const {type, name, handleInput} = props;
+  return <input
+                type = {type}
+                name = {name}
+                className="form-control"
+                onChange={e => handleInput(e)} />
+}
+
+//statefull component
 class FormDemo extends Component {
   constructor(props) {
     super(props);
     this.state = {
       email: '',
+      emailError: '',
       password: '',
-      formErrors: {email: '', password: ''},
+      passwordError: '',
       emailValid: false,
       passwordValid: false,
       formValid: false
     }
+    this.handleUserInput = this.handleUserInput.bind(this);
   }
 
   handleUserInput(e) {
@@ -21,25 +34,27 @@ class FormDemo extends Component {
   }
 
   validateField(fieldName, value) {
-    let fieldValidationErrors = this.state.formErrors;
     let emailValid = this.state.emailValid;
+    let emailError = this.state.emailError;
     let passwordValid = this.state.passwordValid;
+    let passwordError = this.state.passwordError;
 
     switch(fieldName) {
       case 'email':
         emailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
-        fieldValidationErrors.email = emailValid ? '' : ' is invalid';
+        emailError = emailValid ? '' : `${fieldName} is invalid`;
         break;
       case 'password':
         passwordValid = value.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/i);
-        fieldValidationErrors.password = passwordValid ? '': ' is invalid';
+        passwordError = passwordValid ? '': `${fieldName} is invalid`;
         break;
       default:
         break;
     }
-    this.setState({formErrors: fieldValidationErrors,
+    this.setState({ emailError: emailError,
                     emailValid: emailValid,
                     passwordValid: passwordValid,
+                    passwordError : passwordError,
                   }, this.validateForm);
   }
 
@@ -55,17 +70,16 @@ class FormDemo extends Component {
     return (
       <div className="container">
         <form>
-          <div className="panel panel-default">
-            <FormErrors formErrors={this.state.formErrors} />
-          </div>
-          <div className={`form-group ${this.errorClass(this.state.formErrors.email)}`}>
+          <div className={`form-group ${this.errorClass(this.state.emailError)}`}>
             <label>Email address:</label>
-            <input type="email" name="email" className="form-control" onChange={event => this.handleUserInput(event)} value={this.state.email} />
+            <Input type="email" name="email" handleInput={this.handleUserInput} />
           </div>
-          <div className={`form-group ${this.errorClass(this.state.formErrors.password)}`}>
+          <ErrorMessage errorMessage={this.state.emailError} />
+          <div className={`form-group ${this.errorClass(this.state.passwordError)}`}>
             <label>Password:</label>
-            <input type="password" name="password" className="form-control" onChange={event => this.handleUserInput(event)} value={this.state.password} />
+            <Input type="password" name="password" handleInput={this.handleUserInput} />
           </div>
+          <ErrorMessage errorMessage={this.state.passwordError} />
           <button type="submit" className="btn btn-primary" disabled={!this.state.formValid}>Sign up</button>
         </form>
       </div>
