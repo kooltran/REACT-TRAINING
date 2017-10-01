@@ -3,6 +3,7 @@ import CardList from './component/CardList';
 import RouterDemo from './component/RouterDemo';
 import Calculator from './component/LiftingStateUp'
 import FormDemo from './component/FormDemo';
+import FormValidateClick from './component/FormValidateClick';
 import {Router, Route} from 'react-router';
 import './App.css';
 
@@ -13,7 +14,8 @@ class App extends Component {
         {/* <CardList /> */}
         {/* <RouterDemo /> */}
         {/* <Calculator /> */}
-        <FormDemo />
+        {/* <FormDemo /> */}
+        <FormValidateClick />
       </div>
     );
   }
